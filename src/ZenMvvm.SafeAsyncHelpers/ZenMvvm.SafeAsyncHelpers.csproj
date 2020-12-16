@@ -38,11 +38,25 @@
     <LangVersion>9.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="../../LICENSE.md" Pack="true" PackagePath="" />
+    <None Include="..\..\LICENSE.md">
+      <Pack>true</Pack>
+      <PackagePath></PackagePath>
+      <Link>package-items\LICENSE.md</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\art\icon@64x64.png">
+      <Pack>true</Pack>
+      <PackagePath>$(PackageIconUrl)</PackagePath>
+      <Link>package-items\icon@64x64.png</Link>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="ZenMvvm.Helpers.Core" Version="0.0.20201216-15h02m51" />
     <PackageReference Include="ZenMvvm.WeakEventHelpers" Version="0.0.20201216-15h31m28" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="package-items\" />
   </ItemGroup>
 </Project>
