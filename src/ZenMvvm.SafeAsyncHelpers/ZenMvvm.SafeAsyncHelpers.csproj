@@ -32,7 +32,6 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <None Include="../../art/icon@64x64.png" Pack="true" PackagePath="$(PackageIconUrl)" />
     <None Include="../../LICENSE.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
