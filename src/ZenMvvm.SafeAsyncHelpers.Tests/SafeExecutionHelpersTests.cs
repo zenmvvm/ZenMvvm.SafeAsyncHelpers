@@ -4,7 +4,6 @@ using ZenMvvm.Helpers;
 using System.Threading.Tasks;
 using Moq;
 using System.Threading;
-using Xamarin.Forms.Mocks;
 
 namespace ZenMvvm.Tests
 {
@@ -309,7 +308,7 @@ namespace ZenMvvm.Tests
         {
             SafeExecutionHelpers.RevertToDefaultImplementation();
             SafeExecutionHelpers.RemoveDefaultExceptionHandler();
-            MockForms.Init(); //For Device.BeginInvokeOnMainThread
+            //MockForms.Init(); //For Device.BeginInvokeOnMainThread
             var exception = new Exception();
             var handler = new Mock<Action<SpecificException>>();
 

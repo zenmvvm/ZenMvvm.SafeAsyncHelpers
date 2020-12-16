@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.ComponentModel;
-using Xamarin.Forms;
 
 // Adapted from Brandon Minnick's AsyncAwaitBestPractices
 // https://github.com/brminnick/AsyncAwaitBestPractices, 
@@ -122,12 +121,13 @@ namespace ZenMvvm.Helpers
             else if (Settings.DefaultExceptionHandler != null)
                 Settings.DefaultExceptionHandler.Invoke(exception);
 
+            //todo decide if need to force throw on main thread
             else
-                Device.BeginInvokeOnMainThread(()=>throw new SafeExecutionHelpersException(exception));
+                throw new SafeExecutionHelpersException(exception);
 
-
+            //same here
             if (Settings.ShouldAlwaysRethrowException)
-                Device.BeginInvokeOnMainThread(() => throw exception);
+                throw exception;
         }
 
         /// <summary>
