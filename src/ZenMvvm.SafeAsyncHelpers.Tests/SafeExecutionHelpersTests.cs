@@ -398,7 +398,7 @@ namespace ZenMvvm.Tests
         public void HandleException_ShouldRethrow_Throws()
         {
             SafeExecutionHelpers.RevertToDefaultImplementation();
-            MockForms.Init(); //For Device.BeginInvokeOnMainThread
+            //MockForms.Init(); //For Device.BeginInvokeOnMainThread
             SafeExecutionHelpers.Configure(s => s.ShouldAlwaysRethrowException = true);
             SafeExecutionHelpers.RemoveDefaultExceptionHandler();
 
