@@ -162,8 +162,7 @@ namespace ZenMvvm.Helpers
         /// <summary>
         /// For Unit Testing. Command runs using the specified <see cref="TaskScheduler"/>
         /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public SafeCommand(
+        internal SafeCommand(
             Func<T, Task> executeFunction,
             TaskScheduler scheduler,
             IBusy viewModel = null,
@@ -360,8 +359,7 @@ namespace ZenMvvm.Helpers
         /// <summary>
         /// For Unit Testing. Command runs using the specified <see cref="TaskScheduler"/>
         /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)] //Designed for Testing purposes only
-        public SafeCommand(
+        internal SafeCommand(
             Func<object, Task> executeFunction,
             TaskScheduler scheduler,
             IBusy viewModel = null,
@@ -381,8 +379,7 @@ namespace ZenMvvm.Helpers
         /// <summary>
         /// Internal constructor
         /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        protected SafeCommand(
+        internal SafeCommand(
             Func<object, Task> internalExecuteFunction,
             IBusy viewModel,
             Action<Exception> onException,
@@ -399,8 +396,7 @@ namespace ZenMvvm.Helpers
         /// <summary>
         /// Internal constructor
         /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        protected SafeCommand(
+        internal SafeCommand(
             Action<object> internalExecuteAction,
             IBusy viewModel,
             Action<Exception> onException,

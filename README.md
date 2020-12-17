@@ -3,6 +3,12 @@ The suite of SafeAsync helpers provide a safe, consistent way to manage exceptio
 
 [![Coverage](https://raw.githubusercontent.com/zenmvvm/ZenMvvm.SafeAsyncHelpers/develop/coverage/badge_linecoverage.svg)](https://htmlpreview.github.io/?https://raw.githubusercontent.com/zenmvvm/ZenMvvm.SafeAsyncHelpers/develop/coverage/index.html) [![NuGet](https://buildstats.info/nuget/ZenMvvm.SafeAsyncHelpers?includePreReleases=false)](https://www.nuget.org/packages/ZenMvvm.SafeAsyncHelpers/)
 
+centralise error handling
+
+reduce boilerplate try-catch blocks
+
+solve fire-and-forget async void problems
+
 The core of SafeAsync is the `SafeContinueWith` extension method for the `Task` object.
 
 

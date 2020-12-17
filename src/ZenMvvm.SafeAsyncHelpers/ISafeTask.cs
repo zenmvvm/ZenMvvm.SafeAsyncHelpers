@@ -7,7 +7,6 @@ namespace ZenMvvm.Helpers
     /// <summary>
     /// For unit testing and mocking of <see cref="SafeTaskExtensions"/>
     /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Never)]
     internal interface ISafeTask
     {
         /// <summary>
