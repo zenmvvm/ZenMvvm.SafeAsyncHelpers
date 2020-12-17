@@ -1,21 +1,21 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
+
+//todo refactor HandleException()
+// https://docs.microsoft.com/en-us/dotnet/standard/parallel-programming/chaining-tasks-by-using-continuation-tasks
 
 namespace ZenMvvm.Helpers
 {
     /// <summary>
     /// For unit testing and mocking of <see cref="SafeTaskExtensions"/>
     /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public class SafeTask : ISafeTask
+    internal class SafeTask : ISafeTask
     {
         /// <summary>
         /// For unit testing and mocking of <see cref="SafeTaskExtensions"/>
         /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Task SafeContinueWith<TException>(Task task, Action<TException> onException, TaskScheduler scheduler = null) where TException : Exception
+        public Task InternalHandleExceptionLogic<TException>(Task task, Action<TException> onException, TaskScheduler scheduler = null) where TException : Exception
         {
             task.ContinueWith(
                     t => SafeExecutionHelpers

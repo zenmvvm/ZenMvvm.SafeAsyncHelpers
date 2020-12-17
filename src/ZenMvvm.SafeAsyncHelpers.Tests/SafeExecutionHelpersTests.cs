@@ -117,7 +117,7 @@ namespace ZenMvvm.Tests
             Exception exception = null;
 
             //Act
-            NoParameterDelayedNullReferenceExceptionTask().SafeFireAndForget(onException: ex => exception = ex);
+            NoParameterDelayedNullReferenceExceptionTask().FireForgetAndHandleException(onException: ex => exception = ex);
             await NoParameterTask();
             await NoParameterTask();
 
@@ -205,7 +205,7 @@ namespace ZenMvvm.Tests
             NullReferenceException exception = null;
 
             //Act
-            NoParameterDelayedNullReferenceExceptionTask().SafeFireAndForget<NullReferenceException>(onException: ex => exception = ex);
+            NoParameterDelayedNullReferenceExceptionTask().FireForgetAndHandleException<NullReferenceException>(onException: ex => exception = ex);
             await NoParameterTask();
             await NoParameterTask();
 

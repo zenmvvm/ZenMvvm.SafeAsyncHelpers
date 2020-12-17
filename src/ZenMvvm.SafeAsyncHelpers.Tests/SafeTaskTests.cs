@@ -36,7 +36,7 @@ namespace ZenMvvm.Tests
         [Fact]
         public void SafeContinueWith_NothingSet_HandleExceptionRuns()
         {
-            sut.SafeContinueWith<Exception>(
+            sut.InternalHandleExceptionLogic<Exception>(
                 Task.Factory.StartNew(
                     () => throw specificException,
                     CancellationToken.None,
@@ -58,7 +58,7 @@ namespace ZenMvvm.Tests
         {
             Action<Exception> onException = new Mock<Action<Exception>>().Object;
 
-            sut.SafeContinueWith<Exception>(
+            sut.InternalHandleExceptionLogic<Exception>(
                 Task.Factory.StartNew(
                     ()=> throw specificException,
                     CancellationToken.None,
@@ -82,7 +82,7 @@ namespace ZenMvvm.Tests
             //Crux - DefaultHandler returns non-null delegate
             mockHelpers.SetupGet(h => h.Settings.DefaultExceptionHandler).Returns(defaultExceptionHandler);
 
-            sut.SafeContinueWith<Exception>(
+            sut.InternalHandleExceptionLogic<Exception>(
                 task: Task.Factory.StartNew(
                     () => throw specificException,
                     CancellationToken.None,

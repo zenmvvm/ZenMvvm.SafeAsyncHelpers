@@ -510,7 +510,7 @@ namespace ZenMvvm.Helpers
                                     CancellationToken.None,
                                     TaskCreationOptions.DenyChildAttach,
                                     _scheduler)
-                    .SafeContinueWith(_onException, _scheduler) //Handles exception if faulted
+                    .InternalHandleException(_onException, _scheduler) //Handles exception if faulted
                     .ContinueWith(t => IsBusy = false,
                                     CancellationToken.None,
                                     TaskContinuationOptions.None,
@@ -519,12 +519,12 @@ namespace ZenMvvm.Helpers
             if (_mustRunOnCurrentSyncContext)
                 return
                     _executeAsync(parameter)
-                    .SafeContinueWith(_onException)
+                    .HandleException(_onException)
                     .ContinueWith(t => IsBusy = false);
 
             return //run on TaskPool
                 Task.Run(() => _executeAsync(parameter).GetAwaiter().GetResult())
-                               .SafeContinueWith(_onException)
+                               .HandleException(_onException)
                                .ContinueWith(t => IsBusy = false);
         }
 
