@@ -3,8 +3,8 @@
   <PropertyGroup>
 	<!-- General -->
     <AssemblyName>ZenMvvm.SafeAsyncHelpers</AssemblyName>
-    <Description></Description>
-    <Copyright>Copyright 2020 Guy Antoine</Copyright>
+    <Description>The suite of SafeExecution helpers provide a safe, consistent way to catch exceptions when running Asynchronous code while also reducing boilerplate code.</Description>
+    <Copyright>ZenMvvm</Copyright>
     <Authors>Guy Antoine and contributors</Authors>
     <NeutralLanguage>en-GB</NeutralLanguage>
 
@@ -13,7 +13,7 @@
 
     <!-- NuGet settings -->
     <PackageId>ZenMvvm.SafeAsyncHelpers</PackageId>
-    <PackageTags>ZenMvvm.SafeAsyncHelpers</PackageTags> <!-- separate with ; -->
+    <PackageTags>safe-async-helpers;async;asynchronous;exception;exception-handling;safe-fire-and-forget</PackageTags> <!-- separate with ; -->
     <PackageReleaseNotes>https://github.com/zenmvvm/ZenMvvm.SafeAsyncHelpers/releases</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/zenmvvm/ZenMvvm.SafeAsyncHelpers</PackageProjectUrl>
     <!-- Choose either PackageLicenseExpression or PackageLicenseFile (but not both) -->
