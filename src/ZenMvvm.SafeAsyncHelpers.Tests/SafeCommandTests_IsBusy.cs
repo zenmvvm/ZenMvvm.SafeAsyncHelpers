@@ -3,27 +3,14 @@ using Xunit;
 using ZenMvvm.Helpers;
 using System.Threading;
 using System.Threading.Tasks;
-using System.ComponentModel;
 using Moq;
 
 namespace ZenMvvm.Tests
 {
-    public class TestOverloads
-    {
-        public TestOverloads(Action action) {}
-        public TestOverloads(Action action, IBusy viewModel) : this(action) { }
-        public TestOverloads(Action action, IBusy viewModel, Action<Exception> onException) : this(action,viewModel) { }
-
-        public TestOverloads(Func<Task> func) { }
-        public TestOverloads(Func<Task> func, IBusy viewModel) : this(func) { }
-        public TestOverloads(Func<Task> func, IBusy viewModel, Action<Exception> onException) : this(func, viewModel) { }
-
-    }
-
     [Collection("SafeTests")]
     public class SafeCommandTests_IsBusy : IDisposable
     {
-        private Mock<IBusy> iBusyMock;
+        private readonly Mock<IBusy> iBusyMock;
         //Setup
         public SafeCommandTests_IsBusy()
         {
