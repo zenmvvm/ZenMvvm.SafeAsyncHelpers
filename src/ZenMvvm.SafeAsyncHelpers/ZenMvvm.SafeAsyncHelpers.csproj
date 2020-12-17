@@ -53,8 +53,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ZenMvvm.Helpers.Core" Version="0.0.20201216-15h02m51" />
-    <PackageReference Include="ZenMvvm.WeakEventHelpers" Version="0.0.20201216-15h31m28" />
+    <PackageReference Include="ZenMvvm.Helpers.Core" Version="1.0.0" />
+    <PackageReference Include="ZenMvvm.WeakEventHelpers" Version="1.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="package-items\" />
