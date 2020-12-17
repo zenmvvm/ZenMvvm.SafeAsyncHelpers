@@ -4,11 +4,10 @@ using ZenMvvm.Helpers;
 using System.Threading;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using Moq;
 
 namespace ZenMvvm.Tests
 {
-    public class MockViewModel : ViewModelBase { }
-
     public class TestOverloads
     {
         public TestOverloads(Action action) {}
@@ -22,20 +21,46 @@ namespace ZenMvvm.Tests
     }
 
     [Collection("SafeTests")]
-    public class SafeCommandTests_IsBusy
+    public class SafeCommandTests_IsBusy : IDisposable
     {
+        private Mock<IBusy> iBusyMock;
+        //Setup
+        public SafeCommandTests_IsBusy()
+        {
+            iBusyMock = new Mock<IBusy>();
+        }
+        //Teardown
+#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
+        public void Dispose()
+#pragma warning restore CA1816 // Dispose methods should call SuppressFinalize
+        {
+            //
+        }
+
         const int DELAY = 50;
         [Fact]
         public void Execute_WithIBusy_IsBusyTrueWhileRunning()
         {
-            var vm = new MockViewModel();
 
-            var command = new SafeCommand(executeAction: () => { Assert.True(vm.IsBusy); }, vm);
+            var command = new SafeCommand(
+                executeAction: () =>
+                {
+                    //State is true while executing
+                    iBusyMock.VerifySet(o => o.IsBusy = true);
+                    iBusyMock.Invocations.Clear();
+                }
+                , iBusyMock.Object);
 
-            Assert.False(vm.IsBusy);
+            //Initial state is false
+            Assert.False(iBusyMock.Object.IsBusy);
+
+            //Act
             command.Execute(null);
-            //see Assert in command
-            Assert.False(vm.IsBusy);
+
+            //State is false after execution
+            iBusyMock.VerifySet(o => o.IsBusy = false);
+            //Only invoked once after set to true
+            Assert.Equal(1, iBusyMock.Invocations.Count);
         }
 
         [Fact]
@@ -43,33 +68,52 @@ namespace ZenMvvm.Tests
         {
             bool isExecuting = true;
 
-            var vm = new MockViewModel();
-            var command = new SafeCommand(async () => { Assert.True(vm.IsBusy); await Task.Delay(DELAY); isExecuting = false; }, vm);
+            var command = new SafeCommand(async () =>
+            {
+                //State is true when start executing
+                iBusyMock.VerifySet(o => o.IsBusy = true);
+                await Task.Delay(DELAY);
+                //State remains true throughout execution
+                iBusyMock.VerifySet(o => o.IsBusy = true);
+                iBusyMock.Invocations.Clear();
+                isExecuting = false;
+            }, iBusyMock.Object);
 
             var thread = new Thread(new ThreadStart(() => command.Execute(null)));
 
-            Assert.False(vm.IsBusy);
+            //Initial state is false
+            Assert.False(iBusyMock.Object.IsBusy);
+
+            //Act
             thread.Start();
-            //see Assert in command
             while (isExecuting)
                 Thread.Sleep(DELAY / 25);
 
             Thread.Sleep(5);
-            Assert.False(vm.IsBusy);
+            //State is false after execution
+            iBusyMock.VerifySet(o => o.IsBusy = false);
+            //Only invoked once after set to true
+            Assert.Equal(1, iBusyMock.Invocations.Count);
         }
 
         [Theory]
         [InlineData(7)]
         public void ExecuteT_WithIBusy_IsBusyTrueWhileRunning(int number)
         {
-            var vm = new MockViewModel();
+            var command = new SafeCommand<int>(executeAction: (i) => {
+                //True while running
+                iBusyMock.VerifySet(o=>o.IsBusy = true);
+                iBusyMock.Invocations.Clear();
+            }, iBusyMock.Object);
 
-            var command = new SafeCommand<int>(executeAction: (i) => { Assert.True(vm.IsBusy); }, vm);
+            //False before run
+            Assert.False(iBusyMock.Object.IsBusy);
 
-            Assert.False(vm.IsBusy);
+            //Act
             command.Execute(number);
-            //see Assert in command
-            Assert.False(vm.IsBusy);
+            //False after run
+            iBusyMock.VerifySet(o => o.IsBusy = false);
+            Assert.Equal(1, iBusyMock.Invocations.Count);
         }
 
         [Theory]
@@ -78,28 +122,38 @@ namespace ZenMvvm.Tests
         {
             bool isExecuting = true;
 
-            var vm = new MockViewModel();
-            var command = new SafeCommand<int>(async (i) => { Assert.True(vm.IsBusy); await Task.Delay(DELAY); isExecuting = false; }, vm);
+            var command = new SafeCommand<int>(async (i) => {
+                //True while running
+                iBusyMock.VerifySet(o => o.IsBusy = true);
+                await Task.Delay(DELAY);
+                //Still True while running
+                iBusyMock.VerifySet(o => o.IsBusy = true);
+                iBusyMock.Invocations.Clear();
+                isExecuting = false;
+            }
+            , iBusyMock.Object);
 
             var thread = new Thread(new ThreadStart(() => command.Execute(number)));
 
-            Assert.False(vm.IsBusy);
+            //False before start
+            Assert.False(iBusyMock.Object.IsBusy);
             thread.Start();
-            //see Assert in command
             while (isExecuting)
                 Thread.Sleep(DELAY / 25);
 
             Thread.Sleep(5);
-            Assert.False(vm.IsBusy);
+            //False after run
+            iBusyMock.VerifySet(o => o.IsBusy = false);
+            Assert.Equal(1, iBusyMock.Invocations.Count);
         }
 
         [Fact]
         public async Task Execute_ViewModelIsBusy_NotRun()
         {
             bool hasRun = false;
-            var vm = new MockViewModel { IsBusy = true };
+            iBusyMock.SetupGet(o => o.IsBusy).Returns(true);
 
-            var command = new SafeCommand(executeAction: () => { hasRun = true; }, vm);
+            var command = new SafeCommand(executeAction: () => { hasRun = true; }, iBusyMock.Object);
 
             await Task.Run(()=>command.Execute(null));
             Assert.False(hasRun);
@@ -110,9 +164,9 @@ namespace ZenMvvm.Tests
         public async Task ExecuteT_ViewModelIsBusy_NotRun(int number)
         {
             bool hasRun = false;
-            var vm = new MockViewModel { IsBusy = true };
+            iBusyMock.SetupGet(o => o.IsBusy).Returns(true);
 
-            var command = new SafeCommand<int>(executeAction: (i) => { hasRun = true; }, vm);
+            var command = new SafeCommand<int>(executeAction: (i) => { hasRun = true; }, iBusyMock.Object);
 
             await Task.Run(()=>command.Execute(number));
             Assert.False(hasRun);
@@ -123,8 +177,8 @@ namespace ZenMvvm.Tests
         {
             bool hasRun = false;
 
-            var vm = new MockViewModel { IsBusy = true };
-            var command = new SafeCommand(async () => { hasRun = true; await Task.Delay(DELAY); }, vm);
+            iBusyMock.SetupGet(o => o.IsBusy).Returns(true);
+            var command = new SafeCommand(async () => { hasRun = true; await Task.Delay(DELAY); }, iBusyMock.Object);
 
             var thread = new Thread(new ThreadStart(() => command.Execute(null)));
 
@@ -140,8 +194,8 @@ namespace ZenMvvm.Tests
         {
             bool hasRun = false;
 
-            var vm = new MockViewModel { IsBusy = true };
-            var command = new SafeCommand<int>(async (i) => { hasRun = true; await Task.Delay(DELAY); }, vm);
+            iBusyMock.SetupGet(o => o.IsBusy).Returns(true);
+            var command = new SafeCommand<int>(async (i) => { hasRun = true; await Task.Delay(DELAY); }, iBusyMock.Object);
 
             var thread = new Thread(new ThreadStart(() => command.Execute(number)));
 
@@ -150,5 +204,7 @@ namespace ZenMvvm.Tests
             Thread.Sleep(DELAY);
             Assert.False(hasRun);
         }
+
+        
     }
 }
