@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Windows.Input;
 using Moq;
+using Zeebs.UnitTestHelpers;
 
 namespace ZenMvvm.Tests
 {

@@ -4,6 +4,7 @@ using Xunit;
 using ZenMvvm.Helpers;
 using System.Threading;
 using Moq;
+using Zeebs.UnitTestHelpers;
 
 namespace ZenMvvm.Tests
 {
