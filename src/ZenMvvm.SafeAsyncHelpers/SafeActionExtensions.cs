@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 
 namespace ZenMvvm.Helpers
 {
@@ -13,14 +12,12 @@ namespace ZenMvvm.Helpers
         /// <summary>
         /// For unit testing / mocking
         /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static ISafeAction Implementation { private get; set; } = defaultImplementation;
+        internal static ISafeAction Implementation { private get; set; } = defaultImplementation;
 
         /// <summary>
         /// For unit testing / mocking
         /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void RevertToDefaultImplementation()
+        internal static void RevertToDefaultImplementation()
         {
             Implementation = defaultImplementation;
         }
@@ -38,7 +35,7 @@ namespace ZenMvvm.Helpers
             object parameter,
             Action<TException> onException)
             where TException : Exception
-        => Implementation.SafeInvoke(action, parameter, onException);
+        => Implementation.InternalSafeInvoke(action, parameter, onException);
 
         /// <summary>
         /// Execute the Action, handling exceptions with <see cref="SafeExecutionHelpers.DefaultExceptionHandler"/>
@@ -51,7 +48,7 @@ namespace ZenMvvm.Helpers
             this Action action,
             Action<TException> onException)
             where TException : Exception
-        => Implementation.SafeInvoke(action, onException);
+        => Implementation.InternalSafeInvoke(action, onException);
 
         /// <summary>
         /// Execute the Action, handling exceptions with <see cref="SafeExecutionHelpers.DefaultExceptionHandler"/>
@@ -64,7 +61,7 @@ namespace ZenMvvm.Helpers
             this Action<object> action,
             object parameter,
             Action<Exception> onException)
-        => Implementation.SafeInvoke(action, parameter, onException);
+        => Implementation.InternalSafeInvoke(action, parameter, onException);
 
         /// <summary>
         /// Execute the Action, handling exceptions with <see cref="SafeExecutionHelpers.DefaultExceptionHandler"/>
@@ -75,6 +72,6 @@ namespace ZenMvvm.Helpers
         public static void SafeInvoke(
             this Action action,
             Action<Exception> onException)
-        => Implementation.SafeInvoke(action, onException);
+        => Implementation.InternalSafeInvoke(action, onException);
     }
 }

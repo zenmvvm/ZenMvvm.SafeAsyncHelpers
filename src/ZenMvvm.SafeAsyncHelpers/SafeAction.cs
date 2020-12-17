@@ -6,14 +6,12 @@ namespace ZenMvvm.Helpers
     /// <summary>
     /// For unit testing and mocking of <see cref="SafeActionExtensions"/>
     /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public class SafeAction : ISafeAction
+    internal class SafeAction : ISafeAction
     {
         /// <summary>
         /// For unit testing and mocking of <see cref="SafeActionExtensions"/>
         /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public void SafeInvoke<TException>(
+        public void InternalSafeInvoke<TException>(
             Action<object> action,
             object parameter,
             Action<TException> onException)
@@ -32,8 +30,7 @@ namespace ZenMvvm.Helpers
         /// <summary>
         /// For unit testing and mocking of <see cref="SafeActionExtensions"/>
         /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public void SafeInvoke<TException>(Action action, Action<TException> onException)
+        public void InternalSafeInvoke<TException>(Action action, Action<TException> onException)
             where TException : Exception
         {
             try

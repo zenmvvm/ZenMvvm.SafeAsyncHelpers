@@ -7,14 +7,12 @@ namespace ZenMvvm.Helpers
     /// <summary>
     /// For unit testing and mocking of <see cref="SafeTaskExtensions"/>
     /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public interface ISafeTask
+    internal interface ISafeTask
     {
         /// <summary>
         /// For unit testing and mocking of <see cref="SafeTaskExtensions"/>
         /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        Task SafeContinueWith<TException>(
+        Task InternalHandleExceptionLogic<TException>(
             Task task, Action<TException> onException,
             TaskScheduler scheduler = null)
             where TException : Exception;

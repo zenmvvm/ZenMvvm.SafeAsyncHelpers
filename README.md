@@ -1,166 +1,116 @@
-# ![Logo](art/ZenMvvm.SafeAsyncHelpers-64x64.png) ZenMvvm.SafeAsyncHelpers
-Description here
+# ![Logo](art/icon@64x64.png) ZenMvvm.SafeAsyncHelpers
+The suite of SafeAsync helpers provide a safe, consistent way to manage exceptions when running asynchronous code, including a solution to safely fire-and-forget tasks. The library includes an implementation of ICommand, and a Messaging Centre.
 
 [![Coverage](https://raw.githubusercontent.com/zenmvvm/ZenMvvm.SafeAsyncHelpers/develop/coverage/badge_linecoverage.svg)](https://htmlpreview.github.io/?https://raw.githubusercontent.com/zenmvvm/ZenMvvm.SafeAsyncHelpers/develop/coverage/index.html) [![NuGet](https://buildstats.info/nuget/ZenMvvm.SafeAsyncHelpers?includePreReleases=false)](https://www.nuget.org/packages/ZenMvvm.SafeAsyncHelpers/)
 
+centralise error handling
 
-A Template solution directory with:
+reduce boilerplate try-catch blocks
 
-* .NET Standard 2.0 project, and
-  * Best for libraries. Everything uses this API. But no implementation so only good for libraries 
-* .NET 5 Unit Test project (implementation that now replaces  .NET Core 3.1 target framework)
-  * Have to have an implementation for a unit test runner. So .NET 5 is simple... and fully compatable with .NET Standard
+solve fire-and-forget async void problems
 
-## ToDo 
-
-* Add Test Helpers
-
-* update CI if new dependabot script more robust
-
-  * ```
-      dependabotautomerge:
-        # from https://localheinz.com/blog/2020/06/15/merging-pull-requests-with-github-actions/
-        needs: build
-        if: >
-          github.event_name == 'pull_request' &&
-          github.event.pull_request.draft == false && (
-            github.event.action == 'opened' ||
-            github.event.action == 'reopened' ||
-            github.event.action == 'synchronize'
-          ) && (
-          github.actor == 'dependabot[bot]'
-          )
-        runs-on: ubuntu-latest
-        steps:
-          - name: automerge
-            uses: actions/github-script@0.2.0
-            with:
-              script: |
-                const pullRequest = context.payload.pull_request
-                const repository = context.repo
-                await github.pulls.merge({
-                  merge_method: "merge",
-                  owner: repository.owner,
-                  pull_number: pullRequest.number,
-                  repo: repository.repo,
-                  })
-              github-token: ${{github.token}}
-    ```
-
-  * 
-
-## Steps:
-
-Download this repo as zip file
-
-Rename root folder name
-
-* Open GitKraken
-
-* Init
-  * Name project same
-  * Select root folder so that it over-rides / matches the existing folder
-  * Don't select gitignore or license as already there
-  * Should open with initial commit and bunch of unstaged changes
-* STAGE all but .github file workflows/main.yml
-  * this can't be pushed / updated to remote due to security concerns
-* Amend initial commit
-
-* Push
-  * Will ask you to create a remote... do so with your account
-
-***
-
-* Run rename-project.command
-  
-  * Will rename within files, filenames and directories
-  
-  * MacOS security gives issues
-  
-  * ```bash
-    sudo chmod 755 rename-project 
-    ls -l
-    # now should see x for execute
-    ./rename-project 
-    ```
-  
-* Review changes in version-history, and ammend intial commit
-* Force push to server
-
-***
-
-Ensure local and remote are synced (except for unstageed main.yml file)
-
-Login to github online and Create Github action
-
-* copy content from the local main.yml file into the action
-* commit file in git-online
-* delete local version
-* In GitKraken Pull remote from local
+The core of SafeAsync is the `SafeContinueWith` extension method for the `Task` object.
 
 
+ Xamarin Forms' `Command` and `MessagingCenter` have been refactored to implement "safe execution".
 
-Initialise Gitflow and switch to develop branch
+To prevent application crashes from unhandled exceptions, initialise SafeExecutionHelpers with a **default exception handler** that logs the exception.
 
-## Command line option
-
-```bash
-# Download from Github
-curl --location --remote-name https://github.com/z33bs/ZenMvvm.SafeAsyncHelpers/archive/master.zip
-unzip master.zip
-git archive https://github.com/z33bs/ZenMvvm.SafeAsyncHelpers
-wget https://github.com/z33bs/ZenMvvm.SafeAsyncHelpers/archive/master.zip
-
-// Clone the repo
-git clone --depth=1 git://someserver/somerepo dirformynewrepo
-// Remove the .git directory
-rm -rf !$/.git
-
-git clone https://github.com/z33bs/ZenMvvm.SafeAsyncHelpers
-rm -rf .git
-
-# You can install xclip using `apt-get`
-apt-get install xclip
-xclip -sel c < file
-
-```
-
-### Works
-
-```bash
-git clone https://github.com/z33bs/ZenMvvm.SafeAsyncHelpers NewName
-cd NewName
-rm -rf .git
-# do project renaming stuff
-rm rename-project
-
-git init
-git add .
-# git status
-
-# create new branch main
-# will only be able to see when committed
-git checkout -b main
-# git branch -m main
-git commit -m 'Initial commit'
-git branch --list
-
-# create remote
-curl -u 'z33bs' https://api.github.com/user/repos -d '{"name":"NewName"}'
-
-git remote add origin https://github.com/z33bs/NewName
-git push -u origin master
-# Can only create worker afterward
-cat main.yml | pbcopy 
+```c#
+SafeExecutionHelpers.SetDefaultExceptionHandler(
+    (ex) => Console.WriteLine(ex.Message));
 ```
 
 
 
-NET library template with continuous integration
+`SafeCommand` and `SafeMessagingCentere` are refactored to automatically execute in a try-catch block. The methods have been refactored to include an optional `Action<Exception> onException` argument. Safe Execution applies the following logic:
 
-tests
+* If `onException` has been provided and the type of `Exception` thrown matches the type handled in the provided `onException`, execute the provided `onException` handler. 
 
-code coverage
+* Otherwise look for a match in the user-defined `GenericExceptionHandlers`. Generic handlers are initialized as follows
 
-badges
+  * ```c#
+    SafeExecutionHelpers.Configure(s => s.GenericExceptionHandlers.Add(
+      (ArgumentException ex) => 
+      {
+        //Generic handling of ArgumentException here
+      }));
+    ```
+
+* If no match is found, execute the `DefaultExceptionHandler` if it has been defined. The default handler is agnostic to the type of exception. If defined, it has the effect of silencing unhandled exceptions.
+
+* Finally, if no handler is found and no default handler is defined, throw a `SafeExecutionHelpersException` with the offending exception as its `InnerException`.
+
+
+
+For Debugging purposes, one can configure SafeExecutionHelpers to always rethrow exceptions after they have been handled:
+
+```c#
+#if DEBUG
+	SafeExecutionHelpers.Configure(s => s.ShouldAlwaysRethrowException = true);
+#endif
+```
+
+
+
+> :memo:Tip: When providing an `onException` delegate, if the developer anticipates several different exception-types, this can be handled by using pattern-matching (available from C# version 9). For example:
+>
+> ```c#
+>   onException: (Exception ex) =>
+>   {
+>       switch (ex)
+>       {
+>           //Type matching pattern - C# Version 9
+>           case ArgumentException:
+>           		// Handle bad argument
+>               break;
+>   	      case DivideByZeroException:
+>           		// Handle divide by zero
+>     	      	break;
+>   	      case OverflowException:
+>           		// Handle when integer is too large to be stored
+>           		break;
+>           default:
+>               Console.WriteLine(ex.Message);
+>               break;
+>       }            
+>   }
+> ```
+>
+
+
+
+## SafeCommand
+
+In addition to implementing "Safe Execution", the SafeCommand offers the following useful features:
+
+*  If a ViewModel has a bindable `IsBusy` property, will set this to `true` while executing. When using this feature, the default handling of multiple invokations is as follows. If the command is fired multiple times, and the first invokation has not completed the second invokation will be blocked from executing. An example where this is handy is to avoid unstable behaviour from app users double-tapping. 
+  * Optionally, the developer can set the `isBlocking` argument to false, in which case every invokation will be executed.
+  * The corresponding View can bind to `IsBusy` to show an activity indicator when the Command is running. 
+* SafeCommand has been refactored with overloads to execute Asynchronous code. This removes the code-smell  `Command(async () => ExecuteCommandAsync)`, instead writing `SafeCommand(ExecuteCommandAsync)`. 
+* Whereas Xamarin.Forms.Command begins executing on the Main thread, SafeCommand begins executing immediately on the background thread. This prevents UI-blocking code. If the developer explicity wants the command to run on the UI-thread, he can set the `mustRunOnCurrentSyncContext` parameter to true.
+
+
+
+> :memo:Tip: When letting SafeCommand manipulate IsBusy, ensure that when you use OneWay binding in the `<RefreshView>`.
+>
+> ```xaml
+> <RefreshView IsRefreshing="{Binding IsBusy, Mode=OneWay}" 
+>              Command="{Binding LoadItemsCommand}">
+> ```
+
+
+
+## SafeMessagingCenter
+
+This class refactors Xamarin's MessagingCenter with the same features described in `SafeCommand` above. In addition SafeMessagingCenter has been extended with `SubscribeAny` and `UnsubscribeAny`. This lets MessagingCenter subscribe to a specified message that may come from any Sender. This prevents unnecessary code repetition if the same Action should be executed in response to a message sent from different classes.
+
+
+
+## SafeTask and SafeAction Extensions
+
+`MyAction.SafeInvoke()` and `MyTask.SafeContinueWith()` will apply the [Safe Execution](#safe-execution) logic when handling exceptions.
+
+`SafeFireAndForget` will safely fire-and-forget a task (instead of awaiting it), applying the [Safe Execution](#safe-execution) logic when handling exceptions. `SafeFireAndForget` is adapted from Brandon Minnick's [AsyncAwaitBestPractices](https://github.com/brminnick/AsyncAwaitBestPractices), which in turn was inspired by John Thiriet's blog post, [Removing Async Void](https://johnthiriet.com/removing-async-void/).
+
 

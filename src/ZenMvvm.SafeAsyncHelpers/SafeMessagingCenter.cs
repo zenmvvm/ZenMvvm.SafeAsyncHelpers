@@ -133,7 +133,7 @@ namespace ZenMvvm.Helpers
                                     ? null
                                     : target
                                 , parameters))
-                        .SafeContinueWith(OnException)
+                        .HandleException(OnException)
                         .ContinueWith(t => IsBusy = false));
 
                 }
